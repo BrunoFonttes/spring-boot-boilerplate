@@ -31,7 +31,7 @@ public class UserController {
     @GetMapping("/user/{id}")
     User getUserById(@PathVariable Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new RuntimeException());
     }
 
     @PutMapping("/user/{id}")
