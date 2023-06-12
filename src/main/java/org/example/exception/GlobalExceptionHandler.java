@@ -2,7 +2,8 @@ package org.example.exception;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import jakarta.validation.ConstraintViolationException;
-import org.springframework.beans.factory.annotation.Value;
+import org.example.configs.properties.AppProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -21,8 +22,14 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
     public static final String TRACE = "trace";
 
-    @Value("${app.trace:false}")
-    private boolean printStackTrace;
+
+    @Autowired
+    private AppProperties appProperties;
+
+    private boolean printStackTrace(){
+        return this.appProperties.getTrace();
+    }
+
     @ResponseBody
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -77,7 +84,7 @@ public class GlobalExceptionHandler {
                                                       HttpStatus httpStatus,
                                                       WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), message);
-        if (printStackTrace && isTraceOn(request)) {
+        if (this.printStackTrace() && isTraceOn(request)) {
             errorResponse.setStackTrace(ExceptionUtils.getStackTrace(exception));
         }
         return ResponseEntity.status(httpStatus).body(errorResponse);
